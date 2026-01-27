@@ -1,8 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.template import loader
 
 
 def abikasse(request):
-    return HttpResponse("bruv")
-
-# Create your views here.
+    template = loader.get_template('index.html')
+    return HttpResponse(template.render())
