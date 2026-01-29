@@ -9,13 +9,16 @@ class Project(models.Model):
     description = models.TextField()
     starting_date = models.DateTimeField()
     ending_date = models.DateTimeField()
-    creator = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="created_projects"
+
+    creator = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="created_projects"
     )
+
     participants = models.ManyToManyField(
         User,
         related_name="participating_projects",
         blank=True,
     )
+
+    def __str__(self):
+        return self.title
