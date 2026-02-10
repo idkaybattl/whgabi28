@@ -1,6 +1,16 @@
-function openPopup(id) {
-  document.getElementById("popup-" + id).style.display = "block";
+function openDetails(id) {
+  document.getElementById("details-" + id).style.display = "block";
 }
-function closePopup(id) {
-  document.getElementById("popup-" + id).style.display = "none";
+function closeDetails(id) {
+  document.getElementById("details-" + id).style.display = "none";
+}
+
+function openEdit(id) {
+  closeDetails(id);
+  document.getElementById("edit-" + id).style.display = "block";
+}
+
+function closeEdit(id) {
+  document.getElementById("edit-" + id).style.display = "none";
+  openDetails(id);
 }
