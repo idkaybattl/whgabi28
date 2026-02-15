@@ -127,3 +127,7 @@ LOGIN_REDIRECT_URL = "/projects/"
 LOGOUT_REDIRECT_URL = "/login"
 
 LOGIN_URL = "/login"
+
+DATETIME_INPUT_FORMATS = [
+    "%Y-%m-%dT%H:%M",
+]

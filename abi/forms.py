@@ -9,8 +9,18 @@ User = get_user_model()
 class ProjectForm(forms.ModelForm):
     title = forms.CharField(label="Titel ", max_length=255)
     description = forms.CharField(label="Beschreibung ", widget=forms.Textarea())
-    starting_date = forms.DateTimeField(label="Beginn ")
-    ending_date = forms.DateTimeField(label="Ende ")
+    starting_date = forms.DateTimeField(
+        label="Beginn ",
+        widget=forms.DateTimeInput(
+            format="%Y-%m-%dT%H:%M", attrs={"type": "datetime-local"}
+        ),
+    )
+    ending_date = forms.DateTimeField(
+        label="Ende ",
+        widget=forms.DateTimeInput(
+            format="%Y-%m-%dT%H:%M", attrs={"type": "datetime-local"}
+        ),
+    )
     participants = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         widget=forms.MultipleHiddenInput,
