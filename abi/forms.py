@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from .models import Project
 
@@ -101,6 +102,38 @@ class ProjectForm(forms.ModelForm):
             users = list(participants_queryset)
 
         self.fields["participants"].widget.set_users(users)
+
+        min_datetime = timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
+        self.fields["starting_date"].widget.attrs["min"] = min_datetime
+        self.fields["ending_date"].widget.attrs["min"] = min_datetime
+
+    def clean(self):
+        cleaned_data = super().clean()
+        starting_date = cleaned_data.get("starting_date")
+        ending_date = cleaned_data.get("ending_date")
+
+        if not starting_date or not ending_date:
+            return cleaned_data
+
+        if timezone.is_naive(starting_date):
+            starting_date = timezone.make_aware(
+                starting_date,
+                timezone.get_current_timezone(),
+            )
+        if timezone.is_naive(ending_date):
+            ending_date = timezone.make_aware(
+                ending_date,
+                timezone.get_current_timezone(),
+            )
+
+        current_time = timezone.now()
+        if starting_date <= current_time:
+            self.add_error("starting_date", "Der Beginn muss in der Zukunft liegen.")
+
+        if ending_date <= starting_date:
+            self.add_error("ending_date", "Das Ende muss nach dem Beginn liegen.")
+
+        return cleaned_data
 
     class Meta:
         model = Project
