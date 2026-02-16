@@ -6,6 +6,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'abi/projects.css' %}" />
+{{ form_media.css }}
 {% endblock %}
 
 {% block main %}
@@ -48,7 +49,38 @@
     <form method="post" class="edit-content">
         {% csrf_token %}
         <input type="hidden" name="project_id" value="{{ project.id }}">
-        {{ form.as_p }}
+        {{ form.non_field_errors }}
+
+        <p>
+            {{ form.title.errors }}
+            {{ form.title.label_tag }}
+            {{ form.title }}
+        </p>
+
+        <p>
+            {{ form.description.errors }}
+            {{ form.description.label_tag }}
+            {{ form.description }}
+        </p>
+
+        <p>
+            {{ form.starting_date.errors }}
+            {{ form.starting_date.label_tag }}
+            {{ form.starting_date }}
+        </p>
+
+        <p>
+            {{ form.ending_date.errors }}
+            {{ form.ending_date.label_tag }}
+            {{ form.ending_date }}
+        </p>
+
+        <div class="participants-form-field">
+            {{ form.participants.errors }}
+            {{ form.participants.label_tag }}
+            {{ form.participants }}
+        </div>
+
         <button type="submit" value="Fertig">Fertig</button>
 
         <!--<header>
@@ -82,4 +114,5 @@
 
 {% block scripts %}
 <script src="{% static 'abi/js/projects.js' %}"></script>
+{{ form_media.js }}
 {% endblock %}

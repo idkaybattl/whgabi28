@@ -1,0 +1,52 @@
+<div class="participants-widget" data-participants-widget data-field-name="{{ widget.name }}">
+    <div class="participants-widget__selected-wrapper">
+        <strong>Aktuelle Teilnehmer</strong>
+        <ul class="participants-widget__selected-list" data-selected-list>
+            {% for user in widget.selected_users %}
+            <li class="participants-widget__selected-item" data-user-id="{{ user.id }}" data-user-label="{{ user.label }}">
+                <span>{{ user.label }}</span>
+                <button type="button" class="participants-widget__remove" data-remove-user="{{ user.id }}">
+                    Entfernen
+                </button>
+            </li>
+            {% empty %}
+            <li class="participants-widget__empty" data-empty-selected>keine Teilnehmer</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="participants-widget__controls">
+        <label class="participants-widget__label">
+            Nutzer suchen
+            <input
+                type="search"
+                {% if widget.attrs.id %}id="{{ widget.attrs.id }}_search"{% endif %}
+                class="participants-widget__search"
+                data-user-search
+                placeholder="Nutzer suchen ..."
+                autocomplete="off"
+            />
+        </label>
+
+        <label class="participants-widget__label">
+            Nutzer hinzufügen
+            <select class="participants-widget__available-users" data-user-select size="5">
+                {% for user in widget.available_users %}
+                <option value="{{ user.id }}" data-user-label="{{ user.label }}">{{ user.label }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <p class="participants-widget__available-empty{% if widget.available_users %} participants-widget__available-empty--hidden{% endif %}" data-empty-available>
+            Keine weiteren Nutzer verfügbar.
+        </p>
+
+        <button type="button" class="participants-widget__add" data-add-user>Hinzufügen</button>
+    </div>
+
+    <div data-hidden-inputs>
+        {% for value in widget.value %}
+        <input type="hidden" name="{{ widget.name }}" value="{{ value }}" data-hidden-user="{{ value }}" />
+        {% endfor %}
+    </div>
+</div>

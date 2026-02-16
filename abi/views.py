@@ -27,16 +27,38 @@ def projects(request):
         projects = Project.objects.filter(starting_date__gte=now()).order_by(
             "starting_date"
         )
-        users = User.objects.all()
+        username_field = User.USERNAME_FIELD
+        participants_queryset = User.objects.all().order_by(username_field)
+        all_users = list(participants_queryset)
 
         forms = [
-            (project, ProjectForm(instance=project, prefix=str(project.id)))
+            (
+                project,
+                ProjectForm(
+                    instance=project,
+                    prefix=str(project.id),
+                    users=all_users,
+                    participants_queryset=participants_queryset,
+                ),
+            )
             for project in projects
         ]
+
+        if forms:
+            form_media = forms[0][1].media
+        else:
+            form_media = ProjectForm(
+                users=[],
+                participants_queryset=User.objects.none(),
+            ).media
+
         return render(
             request,
             "projects.html",
-            {"forms": forms, "users": users},
+            {
+                "forms": forms,
+                "form_media": form_media,
+            },
         )
 
     if request.method == "POST":
