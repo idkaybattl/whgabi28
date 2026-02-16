@@ -22,10 +22,12 @@
     {% include "projects/_project_create_popup.html" %}
 
     <section class="projects-grid">
-        {% for project, form in forms %}
+        {% for project, form, can_edit, is_participant in forms %}
         {% include "projects/_project_card.html" %}
         {% include "projects/_project_details_popup.html" %}
+        {% if can_edit %}
         {% include "projects/_project_edit_popup.html" %}
+        {% endif %}
         {% empty %}
         <article class="empty-projects">
             <h2>Keine Aktionen geplant</h2>

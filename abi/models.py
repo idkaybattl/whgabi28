@@ -9,6 +9,7 @@ class Project(models.Model):
     description = models.TextField()
     starting_date = models.DateTimeField()
     ending_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="created_projects"

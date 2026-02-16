@@ -89,8 +89,16 @@ class ProjectForm(forms.ModelForm):
         required=False,
     )
 
-    def __init__(self, *args, users=None, participants_queryset=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        users=None,
+        participants_queryset=None,
+        request_user=None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
+        self.request_user = request_user
 
         if participants_queryset is None:
             username_field = User.USERNAME_FIELD
@@ -109,6 +117,7 @@ class ProjectForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        title = cleaned_data.get("title")
         starting_date = cleaned_data.get("starting_date")
         ending_date = cleaned_data.get("ending_date")
 
@@ -133,7 +142,34 @@ class ProjectForm(forms.ModelForm):
         if ending_date <= starting_date:
             self.add_error("ending_date", "Das Ende muss nach dem Beginn liegen.")
 
+        duplicate_owner = (
+            self.instance.creator if self.instance.pk else self.request_user
+        )
+        if title and duplicate_owner:
+            normalized_title = self._normalize_title(title)
+            duplicate_candidates = (
+                Project.objects.filter(
+                    creator=duplicate_owner,
+                    starting_date=starting_date,
+                    ending_date=ending_date,
+                )
+                .exclude(pk=self.instance.pk)
+                .values_list("title", flat=True)
+            )
+
+            for existing_title in duplicate_candidates:
+                if self._normalize_title(existing_title) == normalized_title:
+                    self.add_error(
+                        None,
+                        "Du hast bereits eine Aktion mit gleichem Titel und Zeitfenster.",
+                    )
+                    break
+
         return cleaned_data
+
+    @staticmethod
+    def _normalize_title(value):
+        return " ".join(value.strip().split()).casefold()
 
     class Meta:
         model = Project

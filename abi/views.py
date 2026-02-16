@@ -1,12 +1,42 @@
+from datetime import timedelta
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.timezone import now
+from django.utils import timezone
 
 from .forms import ProjectForm
 from .models import Project
 
 User = get_user_model()
+MAX_PROJECTS_PER_HOUR = 5
+MAX_PROJECTS_PER_DAY = 10
+
+
+def can_edit_project(user, project):
+    return project.creator_id == user.id or user.is_staff
+
+
+def get_project_creation_limit_error(user):
+    current_time = timezone.now()
+    user_projects = Project.objects.filter(creator=user)
+
+    projects_in_last_hour = user_projects.filter(
+        created_at__gte=current_time - timedelta(hours=1)
+    ).count()
+    if projects_in_last_hour >= MAX_PROJECTS_PER_HOUR and not user.is_staff:
+        return (
+            f"Du kannst maximal {MAX_PROJECTS_PER_HOUR} Aktionen pro Stunde erstellen."
+        )
+
+    projects_in_last_day = user_projects.filter(
+        created_at__gte=current_time - timedelta(days=1)
+    ).count()
+    if projects_in_last_day >= MAX_PROJECTS_PER_DAY and not user.is_staff:
+        return f"Du kannst maximal {MAX_PROJECTS_PER_DAY} Aktionen pro Tag erstellen."
+
+    return None
 
 
 def abi(request):
@@ -23,8 +53,19 @@ def projects(request):
     participants_queryset = User.objects.all().order_by(username_field)
     all_users = list(participants_queryset)
     projects = list(
-        Project.objects.filter(starting_date__gte=now()).order_by("starting_date")
+        Project.objects.filter(starting_date__gte=timezone.now())
+        .select_related("creator")
+        .prefetch_related("participants")
+        .order_by("starting_date")
     )
+
+    participant_project_ids = {
+        participant.project_id
+        for participant in Project.participants.through.objects.filter(
+            user_id=request.user.id,
+            project_id__in=[project.id for project in projects],
+        )
+    }
 
     def build_project_form(*, instance=None, data=None, prefix=None):
         return ProjectForm(
@@ -33,6 +74,7 @@ def projects(request):
             prefix=prefix,
             users=all_users,
             participants_queryset=participants_queryset,
+            request_user=request.user,
         )
 
     def build_project_forms(overrides=None):
@@ -42,6 +84,8 @@ def projects(request):
                 project,
                 overrides.get(project.id)
                 or build_project_form(instance=project, prefix=str(project.id)),
+                can_edit_project(request.user, project),
+                project.id in participant_project_ids,
             )
             for project in projects
         ]
@@ -51,6 +95,10 @@ def projects(request):
 
         if form_action == "create_project":
             create_form = build_project_form(data=request.POST, prefix="new")
+            rate_limit_error = get_project_creation_limit_error(request.user)
+            if rate_limit_error:
+                create_form.add_error(None, rate_limit_error)
+
             if create_form.is_valid():
                 new_project = create_form.save(commit=False)
                 new_project.creator = request.user
@@ -72,6 +120,9 @@ def projects(request):
         project_id = request.POST.get("project_id")
         if project_id:
             project = get_object_or_404(Project, pk=project_id)
+            if not can_edit_project(request.user, project):
+                return HttpResponseForbidden("Du darfst diese Aktion nicht bearbeiten.")
+
             edit_form = build_project_form(
                 data=request.POST,
                 instance=project,
@@ -114,9 +165,7 @@ def join_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
     if request.method == "POST":
-        user_id = request.POST.get("user_id")
-        if user_id:
-            user = get_object_or_404(User, id=user_id)
-            project.participants.add(user)
+        if request.user.id != project.creator_id:
+            project.participants.add(request.user)
 
     return redirect("/projects")
