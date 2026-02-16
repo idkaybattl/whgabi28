@@ -1,0 +1,23 @@
+<div class="popup" id="create-project-popup" data-popup>
+    <form
+        method="post"
+        class="popup__content popup__content--create"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-create-title"
+    >
+        {% csrf_token %}
+        <input type="hidden" name="form_action" value="create_project" />
+        <header>
+            <h2 id="project-create-title">Neue Aktion erstellen</h2>
+            <button type="button" class="btn btn-link" data-popup-close>Schließen</button>
+        </header>
+
+        {% include "projects/_project_form_fields.html" with form=create_form %}
+
+        <div class="popup__actions">
+            <button type="submit" class="btn btn-primary">Erstellen</button>
+            <button type="button" class="btn btn-secondary" data-popup-close>Abbrechen</button>
+        </div>
+    </form>
+</div>

@@ -57,3 +57,11 @@ document.addEventListener("keydown", (event) => {
   }
   closeAllPopups();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const initialPopupMarker = document.querySelector("[data-popup-initial]");
+  if (!initialPopupMarker) {
+    return;
+  }
+  openPopupById(initialPopupMarker.dataset.popupInitial);
+});

@@ -19,54 +19,94 @@ def calendar(request):
 
 @login_required
 def projects(request):
-    if request.method == "GET":
-        projects = Project.objects.filter(starting_date__gte=now()).order_by(
-            "starting_date"
-        )
-        username_field = User.USERNAME_FIELD
-        participants_queryset = User.objects.all().order_by(username_field)
-        all_users = list(participants_queryset)
+    username_field = User.USERNAME_FIELD
+    participants_queryset = User.objects.all().order_by(username_field)
+    all_users = list(participants_queryset)
+    projects = list(
+        Project.objects.filter(starting_date__gte=now()).order_by("starting_date")
+    )
 
-        forms = [
+    def build_project_form(*, instance=None, data=None, prefix=None):
+        return ProjectForm(
+            data=data,
+            instance=instance,
+            prefix=prefix,
+            users=all_users,
+            participants_queryset=participants_queryset,
+        )
+
+    def build_project_forms(overrides=None):
+        overrides = overrides or {}
+        return [
             (
                 project,
-                ProjectForm(
-                    instance=project,
-                    prefix=str(project.id),
-                    users=all_users,
-                    participants_queryset=participants_queryset,
-                ),
+                overrides.get(project.id)
+                or build_project_form(instance=project, prefix=str(project.id)),
             )
             for project in projects
         ]
 
-        if forms:
-            form_media = forms[0][1].media
-        else:
-            form_media = ProjectForm(
-                users=[],
-                participants_queryset=User.objects.none(),
-            ).media
-
-        return render(
-            request,
-            "projects.html",
-            {
-                "forms": forms,
-                "form_media": form_media,
-            },
-        )
-
     if request.method == "POST":
-        id = request.POST.get("project_id")
-        project = Project.objects.get(pk=id)
+        form_action = request.POST.get("form_action")
 
-        form = ProjectForm(request.POST, instance=project, prefix=str(project.id))
+        if form_action == "create_project":
+            create_form = build_project_form(data=request.POST, prefix="new")
+            if create_form.is_valid():
+                new_project = create_form.save(commit=False)
+                new_project.creator = request.user
+                new_project.save()
+                create_form.save_m2m()
+                return redirect("/projects")
 
-        if form.is_valid():
-            form.save()
+            return render(
+                request,
+                "projects.html",
+                {
+                    "forms": build_project_forms(),
+                    "create_form": create_form,
+                    "form_media": create_form.media,
+                    "initial_popup_id": "create-project-popup",
+                },
+            )
+
+        project_id = request.POST.get("project_id")
+        if project_id:
+            project = get_object_or_404(Project, pk=project_id)
+            edit_form = build_project_form(
+                data=request.POST,
+                instance=project,
+                prefix=str(project.id),
+            )
+
+            if edit_form.is_valid():
+                edit_form.save()
+                return redirect("/projects")
+
+            return render(
+                request,
+                "projects.html",
+                {
+                    "forms": build_project_forms(overrides={project.id: edit_form}),
+                    "create_form": build_project_form(prefix="new"),
+                    "form_media": edit_form.media,
+                    "initial_popup_id": f"edit-{project.id}",
+                },
+            )
 
         return redirect("/projects")
+
+    create_form = build_project_form(prefix="new")
+    project_forms = build_project_forms()
+
+    return render(
+        request,
+        "projects.html",
+        {
+            "forms": project_forms,
+            "create_form": create_form,
+            "form_media": create_form.media,
+        },
+    )
 
 
 @login_required

@@ -15,9 +15,11 @@
         <h1>Anstehende Aktionen</h1>
         <div class="top-bar__actions">
             <a href="/calendar" class="btn btn-link">Kalender</a>
-            <button type="button" class="btn btn-primary">Neue Aktion</button>
+            <button type="button" class="btn btn-primary" data-popup-open="create-project-popup">Neue Aktion</button>
         </div>
     </section>
+
+    {% include "projects/_project_create_popup.html" %}
 
     <section class="projects-grid">
         {% for project, form in forms %}
@@ -31,6 +33,10 @@
         </article>
         {% endfor %}
     </section>
+
+    {% if initial_popup_id %}
+    <span hidden data-popup-initial="{{ initial_popup_id }}"></span>
+    {% endif %}
 </main>
 
 {% endblock %}
