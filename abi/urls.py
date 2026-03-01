@@ -9,6 +9,7 @@ urlpatterns = [
     path("", views.abi, name="abi"),
     path("calendar/", views.calendar, name="calendar"),
     path("projects/", views.projects, name="projects"),
-    path("upcoming/<int:project_id>/join/", views.join_project, name="join-project"),
-    path("upcoming/<int:project_id>/leave/", views.leave_project, name="leave-project"),
+    path("projects/<int:project_id>/join/", views.join_project, name="join-project"),
+    path("projects/<int:project_id>/leave/", views.leave_project, name="leave-project"),
+    path("previous/", views.previous, name="previous"),
 ]

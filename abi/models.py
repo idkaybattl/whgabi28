@@ -23,3 +23,8 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Abikasse(models.Model):
+    goal = models.IntegerField()
+    current = models.IntegerField()
