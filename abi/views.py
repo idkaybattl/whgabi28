@@ -136,7 +136,7 @@ def projects(request):
         project_id = request.POST.get("project_id")
         if project_id:
             project = get_object_or_404(Project, pk=project_id)
-            if not can_edit_project(request.user, project):
+            if not can_edit_project(request.user, project) or project.final:
                 return HttpResponseForbidden("Du darfst diese Aktion nicht bearbeiten.")
 
             edit_form = build_project_form(
@@ -182,7 +182,7 @@ def projects(request):
 def join_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    if request.method == "POST":
+    if request.method == "POST" and not project.final:
         project.participants.add(request.user)
         messages.success(request, "Du nimmst jetzt Teil.")
 
@@ -194,7 +194,7 @@ def join_project(request, project_id):
 def leave_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    if request.method == "POST":
+    if request.method == "POST" and not project.final:
         project.participants.remove(request.user)
         messages.success(request, "Du hast dein Teilnahme beendet.")
 
@@ -278,7 +278,7 @@ def previous(request):
         project_id = request.POST.get("project_id")
         if project_id:
             project = get_object_or_404(Project, pk=project_id)
-            if not can_edit_project(request.user, project):
+            if not can_edit_project(request.user, project) or project.final:
                 return HttpResponseForbidden("Du darfst diese Aktion nicht bearbeiten.")
 
             edit_form = build_project_form(
