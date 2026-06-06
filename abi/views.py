@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .forms import ProjectForm
-from .models import Project
+from .models import Abikasse, Project
 
 User = get_user_model()
 MAX_PROJECTS_PER_HOUR = 5
@@ -43,7 +43,18 @@ def get_project_creation_limit_error(user):
 
 
 def abi(request):
-    return render(request, "index.html")
+    abikasse, _ = Abikasse.objects.get_or_create(
+        pk=1,
+        defaults={
+            "current": 0,
+            "goal": 30000,
+        },
+    )
+    return render(
+        request,
+        "index.html",
+        {"abikasse_current": abikasse.current, "abikasse_goal": abikasse.goal},
+    )
 
 
 def calendar(request):

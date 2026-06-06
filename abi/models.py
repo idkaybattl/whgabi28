@@ -22,9 +22,16 @@ class Project(models.Model):
     )
 
     def __str__(self):
-        return self.title
+        return str(self.title)
 
 
 class Abikasse(models.Model):
-    goal = models.IntegerField()
+    goal = models.PositiveIntegerField()
     current = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return "Abikasse"
