@@ -137,8 +137,10 @@ GitHub.sublime-settings
 !.vscode/extensions.json
 .history
 
+# Docker
 Dockerfile
 compose.yaml
 compose.yml
 docker-compose.yaml
 docker-compose.yml
+docker-compose.override.yml
