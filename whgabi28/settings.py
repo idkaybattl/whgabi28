@@ -30,6 +30,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# TODO: into env
 ALLOWED_HOSTS = [
     "localhost",
     "192.168.178.90",
@@ -39,6 +40,14 @@ ALLOWED_HOSTS = [
     "192.168.178.219",
     "whgabi28.de",
     "84.183.51.194",
+]
+
+# TODO: into env
+CSRF_TRUSTED_ORIGINS = [
+    "https://192.168.178.218",
+    "http://192.168.178.218",
+    "https://84.183.51.194",
+    "http://84.183.51.194",
 ]
 
 
