@@ -7,7 +7,7 @@ User = settings.AUTH_USER_MODEL
 class Project(models.Model):
     # set to true when approved by staff
     # makes model instance unchangable
-    final = models.BooleanField()
+    final = models.BooleanField( default = False )
 
     title = models.CharField(max_length=255)
     description = models.TextField()
