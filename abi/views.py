@@ -1,4 +1,5 @@
 from datetime import timedelta
+from email.mime import message
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -65,20 +66,23 @@ def calendar(request):
 
 @login_required
 def create_project(request):
-    participants_queryset = get_participants_queryset()
-    all_users = list(participants_queryset)
-
-    form = build_project_form(
-        request=request,
-        users=all_users,
-        participants_queryset=participants_queryset,
-        data=request.POST,
-        prefix="new",
-    )
-
     rate_limit_error = get_project_creation_limit_error(request.user)
     if rate_limit_error:
-        form.add_error(None, rate_limit_error)
+        messages.error(request, rate_limit_error)
+        return
+
+    if request.method == "GET":
+        form = ProjectForm(prefix="new", request_user=request.user)
+        return render(
+            request,
+            "projects/_project_create_popup.html",
+            {
+                "form": form,
+            },
+        )
+
+    data = request.POST
+    form = ProjectForm(data=data, prefix="new")
 
     if form.is_valid():
         new_project = form.save(commit=False)

@@ -1,6 +1,6 @@
 <div class="popup-content" id="create-project-popup" data-popup>
     <form method="post" class="popup__content popup__content--create" data-project-form role="dialog" aria-modal="true"
-        aria-labelledby="project-create-title" action="{% url 'create-project' project.id %}">
+        aria-labelledby="project-create-title" action="{% url 'project-create' %}">
         {% csrf_token %}
         <input type="hidden" name="form_action" value="create_project" />
         <header>
@@ -8,7 +8,7 @@
             <button type="button" class="btn btn-link" data-popup-close>Schließen</button>
         </header>
 
-        {% include "projects/_project_form_fields.html" with form=create_form %}
+        {% include "projects/_project_form_fields.html" %}
 
         <div class="popup__actions">
             <button type="submit" class="btn btn-primary">Erstellen</button>
