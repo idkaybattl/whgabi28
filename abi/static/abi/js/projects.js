@@ -146,10 +146,6 @@ function updateProjectFormDateValidation(form) {
   const startDate = parseDateTimeLocal(startInput.value);
   const endDate = parseDateTimeLocal(endInput.value);
 
-  if (startDate && startDate <= now) {
-    startInput.setCustomValidity("Der Beginn muss in der Zukunft liegen.");
-  }
-
   if (startDate && endDate && endDate <= startDate) {
     endInput.setCustomValidity("Das Ende muss nach dem Beginn liegen.");
   }

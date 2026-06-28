@@ -111,10 +111,6 @@ class ProjectForm(forms.ModelForm):
 
         self.fields["participants"].widget.set_users(users)
 
-        min_datetime = timezone.localtime(timezone.now()).strftime("%Y-%m-%dT%H:%M")
-        self.fields["starting_date"].widget.attrs["min"] = min_datetime
-        self.fields["ending_date"].widget.attrs["min"] = min_datetime
-
     def clean(self):
         cleaned_data = super().clean()
         title = cleaned_data.get("title")
@@ -134,10 +130,6 @@ class ProjectForm(forms.ModelForm):
                 ending_date,
                 timezone.get_current_timezone(),
             )
-
-        current_time = timezone.now()
-        if starting_date <= current_time:
-            self.add_error("starting_date", "Der Beginn muss in der Zukunft liegen.")
 
         if ending_date <= starting_date:
             self.add_error("ending_date", "Das Ende muss nach dem Beginn liegen.")
