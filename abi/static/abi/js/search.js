@@ -30,7 +30,7 @@ function scoreFields(query, orderedFields) {
 // scoring each item by that
 // filtering out those that dont match query in any field
 // sorting by score then by alphabet by most important field
-function search(query, items, getFields) {
+function searchItems(query, items, getFields) {
   return items
     .map((item) => {
       const fields = getFields(item);

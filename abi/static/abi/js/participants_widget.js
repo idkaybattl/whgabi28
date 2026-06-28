@@ -1,3 +1,6 @@
+// global storage for all users available
+let allUserOptions = [];
+
 function createSelectedItem(userId, userLabel) {
   const item = document.createElement("li");
   item.className = "participants-widget__selected-item";
@@ -78,15 +81,13 @@ function filterAvailableUsers(widget) {
   const searchInput = widget.querySelector("[data-user-search]");
   const select = widget.querySelector("[data-user-select]");
   const addButton = widget.querySelector("[data-add-user]");
-  const term = searchInput.value.trim();
-
-  const options = Array.from(select.options);
+  const term = searchInput.value.toLowerCase();
 
   const visibleOptions = term
-    ? getSearchResults(term, options, (option) => [
+    ? searchItems(term, allUserOptions, (option) => [
       option.dataset.userLabel || option.textContent,
     ])
-    : options.sort((a, b) => a.text.localeCompare(b.text, "de"));
+    : allUserOptions.sort((a, b) => a.text.localeCompare(b.text, "de"));
 
   select.innerHTML = "";
   visibleOptions.forEach((option) => select.add(option));
@@ -124,6 +125,12 @@ function addParticipant(widget) {
   hiddenInputsContainer.appendChild(createHiddenInput(fieldName, userId));
   selectedOption.remove();
 
+  // remove the selected option from allUserOptions
+  const selectedIndex = allUserOptions.findIndex(user => user.value === userId);
+  if (selectedIndex !== -1) {
+    allUserOptions.splice(selectedIndex, 1);
+  }
+
   updateSelectedEmptyState(widget);
   updateAvailableState(widget);
   filterAvailableUsers(widget);
@@ -155,12 +162,15 @@ function removeParticipant(widget, userId) {
     hiddenInput.remove();
   }
 
+  // add user back to avaialble participant options
   const option = document.createElement("option");
   option.value = userId;
   option.dataset.userLabel = userLabel;
   option.textContent = userLabel;
-  select.add(option);
-  sortSelectOptions(select);
+
+  allUserOptions.push(option);
+  // refilter the select
+  filterAvailableUsers(widget);
 
   updateSelectedEmptyState(widget);
   updateAvailableState(widget);
@@ -181,6 +191,9 @@ function initParticipantsWidget(widget) {
   }
 
   widget.dataset.participantsWidgetInitialized = "true";
+
+  // Initialise all user options
+  allUserOptions = Array.from(select.options)
 
   addButton.addEventListener("click", () => addParticipant(widget));
   searchInput.addEventListener("input", () => filterAvailableUsers(widget));

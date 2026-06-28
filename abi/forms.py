@@ -12,7 +12,7 @@ class ParticipantsWidget(forms.Widget):
 
     class Media:
         css = {"all": ("abi/participants_widget.css",)}
-        js = ("abi/js/participants_widget.js",)
+        js = ("abi/js/participants_widget.js", "abi/js/search.js")
 
     def __init__(self, attrs=None):
         super().__init__(attrs)
