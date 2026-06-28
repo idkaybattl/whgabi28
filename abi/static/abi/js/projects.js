@@ -134,11 +134,7 @@ function updateProjectFormDateValidation(form) {
     return true;
   }
 
-  const now = getNowRoundedToMinute();
-  const nowString = formatDateTimeLocal(now);
-
-  startInput.min = nowString;
-  endInput.min = startInput.value || nowString;
+  endInput.min = startInput.value;
 
   startInput.setCustomValidity("");
   endInput.setCustomValidity("");
