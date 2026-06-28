@@ -3,75 +3,66 @@
 <!doctype html>
 
 <html lang="de">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{% block title %}Abi 28{% endblock %}</title>
 
-        <link rel="stylesheet" href="{% static 'abi/base.css' %}?v=20260216b" />
-        <link rel="stylesheet" href="{% static 'abi/colors.css' %}?v=20260216c" />
-        {% block head %} {% endblock %}
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Abi 28{% endblock %}</title>
 
-        <!-- Schrift -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-    </head>
+    <link rel="stylesheet" href="{% static 'abi/base.css' %}?v=20260216b" />
+    <link rel="stylesheet" href="{% static 'abi/colors.css' %}?v=20260216c" />
+    {% block head %} {% endblock %}
 
-    <body>
-        <header>
-            <a href="/">
-                <h1>Abi 28</h1>
-            </a>
-            {% if user.is_authenticated %}
-            <details class="profile-menu">
-                <summary class="profile-btn">Profil</summary>
-                <div class="profile-menu__content">
-                    <a href="/projects/" class="profile-menu__link">Meine Aktionen</a>
-                    <a href="/calendar/" class="profile-menu__link">Kalender</a>
-                    {% if user.is_staff %}
-                    <a href="/admin/" class="profile-menu__link">Admin Panel</a>
-                    {% endif %}
-                    <form method="post" action="{% url 'logout' %}" class="profile-menu__logout-form">
-                        {% csrf_token %}
-                        <button type="submit" class="profile-menu__logout">Logout</button>
-                    </form>
-                </div>
-            </details>
-            {% else %}
-            <a href="{% url 'login' %}" class="profile-btn">Login</a>
-            {% endif %}
-        </header>
+    <!-- Schrift -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
 
-        {% if messages %}
-        <section class="site-messages" aria-label="Systemmeldungen">
-            {% for message in messages %}
-            <div class="site-message{% if message.tags %} {{ message.tags }}{% endif %}" role="status" data-site-message
-                data-dismiss-after="6000">
-                <div class="site-message__icon" aria-hidden="true">
-                    {% if "success" in message.tags %}
-                    <span>✓</span>
-                    {% elif "warning" in message.tags %}
-                    <span>!</span>
-                    {% elif "error" in message.tags %}
-                    <span>✕</span>
-                    {% else %}
-                    <span>i</span>
-                    {% endif %}
-                </div>
-                <p class="site-message__text">{{ message }}</p>
-                <button type="button" class="site-message__dismiss" data-dismiss-message aria-label="Meldung schließen">
-                    ×
-                </button>
-                <div class="site-message__timer" aria-hidden="true"></div>
+<body>
+    <header>
+        <a href="/">
+            <h1>Abi 28</h1>
+        </a>
+        {% if user.is_authenticated %}
+        <details class="profile-menu">
+            <summary class="profile-btn">Profil</summary>
+            <div class="profile-menu__content">
+                <a href="/projects/" class="profile-menu__link">Meine Aktionen</a>
+                <a href="/calendar/" class="profile-menu__link">Kalender</a>
+                {% if user.is_staff %}
+                <a href="/admin/" class="profile-menu__link">Admin Panel</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="profile-menu__logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="profile-menu__logout">Logout</button>
+                </form>
             </div>
-            {% endfor %}
-        </section>
+        </details>
+        {% else %}
+        <a href="{% url 'login' %}" class="profile-btn">Login</a>
         {% endif %}
+    </header>
 
-        {% block main %}{% endblock %}
+    {% if messages %}
+    <section class="site-messages" aria-label="Systemmeldungen">
+        {% for message in messages %}
+        <div class="site-message{% if message.tags %} {{ message.tags }}{% endif %}" role="status" data-site-message
+            data-dismiss-after="6000">
+            <p class="site-message__text">{{ message }}</p>
+            <button type="button" class="site-message__dismiss" data-dismiss-message aria-label="Meldung schließen">
+                ×
+            </button>
+            <div class="site-message__timer" aria-hidden="true"></div>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
 
-        <script src="{% static 'abi/js/messages.js' %}?v=20260216b"></script>
-        {% block scripts %}{% endblock %}
-    </body>
+    {% block main %}{% endblock %}
+
+    <script src="{% static 'abi/js/messages.js' %}?v=20260216b"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
 </html>
