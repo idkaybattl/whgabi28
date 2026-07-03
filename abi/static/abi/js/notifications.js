@@ -56,8 +56,6 @@ function markAsRead(event) {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        const clickedButton = event.target;
-        clickedButton.closest('.notification').remove();
         updateNotifications(document.getElementById("notifications"));
       }
     })

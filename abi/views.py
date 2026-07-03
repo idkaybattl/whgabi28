@@ -1,5 +1,4 @@
 from datetime import timedelta
-from operator import not_
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -12,7 +11,9 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET, require_POST
 
 from .forms import ProjectForm
-from .models import Abikasse, Notification, Project
+from .models import Abikasse, Project
+from .notifications import Notification
+from .services import save_project, save_project_form
 
 User = get_user_model()
 MAX_PROJECTS_PER_HOUR = 5
@@ -90,7 +91,9 @@ def notifications(request):
     notifications = Notification.objects.filter(user=user, is_read=False).order_by(
         "-created_at"
     )
-    return render(request, "notifications.html", {"notifications": notifications})
+    return render(
+        request, "components/notifications.html", {"notifications": notifications}
+    )
 
 
 @login_required
@@ -139,13 +142,15 @@ def create_project(request):
     form = ProjectForm(data=data, prefix="new", request_user=request.user)
 
     if form.is_valid():
-        new_project = form.save(commit=False)
+        new_project = save_project_form(form, commit=False)
         new_project.creator = request.user
-        new_project.save()
+        save_project(new_project)
         form.save_m2m()
         messages.success(request, "Projekt erfolgreich erstellt.")
 
         return redirect_next_or(request, "projects")
+    else:
+        messages.error(request, "Form ist invalide.")
 
     return render(
         request,
@@ -171,10 +176,12 @@ def edit_project(request, project_id):
         )
 
         if form.is_valid():
-            form.save()
+            save_project_form(form)
             messages.success(request, "Projekt erfolgreich bearbeitet.")
 
             return redirect_next_or(request, "projects")
+        else:
+            messages.error(request, "Form ist invalide.")
 
         return render(
             request,
@@ -240,12 +247,10 @@ def projects(request, mode):
                 .order_by("starting_date")
             )
 
-    # The actual form is loaded into the dialog; this only renders widget assets.
-    form_media = ProjectForm(participants_queryset=User.objects.none()).media
     return render(
         request,
         "projects.html",
-        {"projects": projects, "form_media": form_media},
+        {"projects": projects},
     )
 
 

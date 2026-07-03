@@ -6,7 +6,6 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'abi/projects.css' %}" />
-{{ form_media.css }}
 {% endblock %}
 
 {% block main %}
@@ -29,7 +28,6 @@
             <p>Zurzeit gibt es keine zukünftigen Aktionen.</p>
         </article>
         {% endfor %}
-        <dialog data-popup class="popup-big" id="popup-big" closedby="any"></dialog>
     </section>
 
     {% if initial_popup_id %}
@@ -37,9 +35,4 @@
     {% endif %}
 </main>
 
-{% endblock %}
-
-{% block scripts %}
-<script src="{% static 'abi/js/projects.js' %}"></script>
-{{ form_media.js }}
 {% endblock %}

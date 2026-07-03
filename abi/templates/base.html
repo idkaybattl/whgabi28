@@ -9,8 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Abi 28{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'abi/base.css' %}?v=20260216b" />
-    <link rel="stylesheet" href="{% static 'abi/colors.css' %}?v=20260216c" />
+    <link rel="stylesheet" href="{% static 'abi/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'abi/colors.css' %}" />
+    <link rel="stylesheet" href="{% static 'abi/participants_widget.css' %}" />
     {% block head %} {% endblock %}
 
     <!-- Schrift -->
@@ -70,8 +71,14 @@
 
     {% block main %}{% endblock %}
 
-    <script src="{% static 'abi/js/messages.js' %}?v=20260216b"></script>
+    <dialog data-popup class="popup-big" id="popup-big" closedby="any"></dialog>
+
     <script src="{% static 'abi/js/cookies.js'  %}"></script>
+    <script src="{% static 'abi/js/messages.js' %}?v=20260216b"></script>
+    <script src="{% static 'abi/js/search.js' %}"></script>
+    <script src="{% static 'abi/js/popups.js' %}"></script>
+    <script src="{% static 'abi/js/projects.js' %}"></script>
+    <script src="{% static 'abi/js/participants_widget.js' %}"></script>
     <script src="{% static 'abi/js/notifications.js' %}"></script>
     {% block scripts %}{% endblock %}
 </body>
