@@ -17,17 +17,17 @@
 
     <!-- Hauptnavigation -->
     <section class="grid">
-        <a class="card" href="/projects/upcoming">
+        <a class="card" href="{% url 'projects-upcoming' %}">
             <h2>Anstehende Aktionen</h2>
             <p>Alle geplanten und anstehenden Aktionen anzeigen</p>
         </a>
 
-        <a class="card">
+        <a class="card" href="{% url 'polls' %}">
             <h2>Umfragen</h2>
             <p>Über Mottos, Aktionen & mehr abstimmen</p>
         </a>
 
-        <a class="card" href="/projects/own">
+        <a class="card" href="{% url 'projects-own' %}">
             <h2>Meine Aktionen</h2>
             <p>Bereits erledigte Aktionen einsehen</p>
         </a>

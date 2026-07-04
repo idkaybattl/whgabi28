@@ -69,6 +69,7 @@ def get_project_creation_limit_error(user):
 
 
 @login_required
+@require_GET
 def abi(request):
     abikasse, _ = Abikasse.objects.get_or_create(
         pk=1,
@@ -204,6 +205,7 @@ def edit_project(request, project_id):
 
 
 @login_required
+@require_GET
 def projects(request, mode):
     now = timezone.now()
 
@@ -255,6 +257,7 @@ def projects(request, mode):
 
 
 @login_required
+@require_GET
 def project_details(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     can_edit = not project.final and (
@@ -325,3 +328,9 @@ def delete_project(request, project_id):
         messages.success(request, "Projekt erfolgreich gelöscht")
 
     return redirect_next_or(request, "projects")
+
+
+@login_required
+@require_GET
+def polls(request):
+    return render(request, "polls.html")
