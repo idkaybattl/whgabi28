@@ -21,12 +21,30 @@ class Project(models.Model):
 
     participants = models.ManyToManyField(
         User,
+        through="ProjectParticipation",
         related_name="participating_projects",
         blank=True,
     )
 
     def __str__(self):
         return str(self.title)
+
+
+class ProjectParticipation(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    participation_time = models.DurationField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("project", "user")
+
+    def save(self, *args, **kwargs):
+        if not self.participation_time:
+            self.participation_time = (
+                self.project.ending_date - self.project.starting_date  # pyright: ignore[reportAttributeAccessIssue]
+            )
+        super().save(*args, **kwargs)
 
 
 class Abikasse(models.Model):

@@ -63,7 +63,10 @@ class Notification(models.Model):
         return False
 
 
-def notify_participants(project: Project, added, removed):
+def notify_participants(project: Project, old, new):
+    added = new - old
+    removed = old - new
+
     for participant in added:
         # Notify the participant that they have been added to a project
         Notification(

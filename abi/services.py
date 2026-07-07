@@ -1,41 +1,37 @@
-from .forms import ProjectForm
-from .models import Project
+from .models import ProjectParticipation
 from .notifications import notify_participants
 
 
-def save_project_form(form: ProjectForm, **kwargs) -> Project:
-    project = form.instance
+def update_participants(project, selected_users):
+    # Remove old participants
+    ProjectParticipation.objects.filter(project=project).exclude(
+        user__in=selected_users
+    ).delete()
 
-    if project.pk:  # if project instance existed before save
-        old_participants = set(project.participants.all())
+    # Add new participants
+    existing = set(project.participants.values_list("id", flat=True))
+    for user in selected_users:
+        if user.id not in existing:
+            ProjectParticipation.objects.create(
+                project=project,
+                user=user,
+            )
+
+
+def save_project(form, user):
+    if form.instance.pk:
+        old = set(form.cleaned_data["participants"])
     else:
-        old_participants = set()
+        old = set()
 
-    project = form.save(**kwargs)
-
-    new_participants = set(project.participants.all())
-
-    added = new_participants - old_participants
-    removed = old_participants - new_participants
-
-    notify_participants(project, added, removed)
-
-    return project
-
-
-def save_project(project: Project):
-
+    project = form.save(commit=False)
+    project.creator = user
     project.save()
 
-    old_project_state = Project.objects.get(pk=project.pk)
-    if old_project_state:
-        old_participants = set(old_project_state.participants.all())
-    else:
-        old_participants = set()
+    update_participants(project, form.cleaned_data["participants"])
 
-    new_participants = set(project.participants.all())  # pyright: ignore[reportAttributeAccessIssue]
+    new = set(project.participants.all())
 
-    added = new_participants - old_participants
-    removed = old_participants - new_participants
+    notify_participants(project, old, new)
 
-    notify_participants(project, added, removed)
+    return project

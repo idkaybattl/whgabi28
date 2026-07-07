@@ -13,7 +13,7 @@ from django.views.decorators.http import require_GET, require_POST
 from .forms import ProjectForm
 from .models import Abikasse, Project
 from .notifications import Notification
-from .services import save_project, save_project_form
+from .services import save_project
 
 User = get_user_model()
 MAX_PROJECTS_PER_HOUR = 5
@@ -143,10 +143,7 @@ def create_project(request):
     form = ProjectForm(data=data, prefix="new", request_user=request.user)
 
     if form.is_valid():
-        new_project = save_project_form(form, commit=False)
-        new_project.creator = request.user
-        save_project(new_project)
-        form.save_m2m()
+        save_project(form, request.user)
         messages.success(request, "Projekt erfolgreich erstellt.")
 
         return redirect_next_or(request, "projects")
@@ -177,7 +174,8 @@ def edit_project(request, project_id):
         )
 
         if form.is_valid():
-            save_project_form(form)
+            save_project(form, request.user)
+
             messages.success(request, "Projekt erfolgreich bearbeitet.")
 
             return redirect_next_or(request, "projects")
@@ -212,6 +210,7 @@ def projects(request, mode):
     if mode == "upcoming":
         projects = (
             Project.objects.filter(ending_date__gt=timezone.now())
+            .distinct()
             .select_related("creator")
             .prefetch_related("participants")
             .order_by("starting_date")
@@ -222,6 +221,7 @@ def projects(request, mode):
             Project.objects.filter(
                 Q(participants=request.user) | Q(creator=request.user)
             )
+            .distinct()
             .select_related("creator")
             .prefetch_related("participants")
             .order_by("starting_date")
@@ -232,6 +232,7 @@ def projects(request, mode):
         if request.user.is_staff:
             projects = (
                 Project.objects.all()
+                .distinct()
                 .select_related("creator")
                 .prefetch_related("participants")
                 .order_by("starting_date")
