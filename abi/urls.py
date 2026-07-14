@@ -47,6 +47,9 @@ urlpatterns = [
         views.set_earnings_received,
         name="set-earnings-received",
     ),
+    # users
+    path("users/", views.users, name="users"),
+    path("users/<int:user_id>/", views.user_details, name="user-details"),
     # polls
     path("polls/", views.polls, name="polls"),
 ]

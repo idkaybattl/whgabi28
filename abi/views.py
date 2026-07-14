@@ -24,6 +24,14 @@ def can_edit_project(user, project):
     return not project.final and (project.creator_id == user.id or user.is_staff)
 
 
+def can_view_all_projects(request):
+    return request.user.is_staff
+
+
+def can_view_users(request):
+    return request.user.is_staff
+
+
 def get_safe_next_url(request):
     next_url = request.POST.get("next") or request.GET.get("next")
     if not next_url:
@@ -109,6 +117,8 @@ def abi(request):
         {
             "abikasse_current": abikasse.total_earnings(),
             "abikasse_goal": abikasse.goal,
+            "can_view_all_projects": can_view_all_projects(request),
+            "can_view_users": can_view_users(request),
             "ranking": ranking,
         },
     )
@@ -415,6 +425,24 @@ def set_earnings_received(request, project_id):
             messages.success(request, "Einnahmen erfolgreich gesetzt.")
 
     return redirect_next_or(request, "projects")
+
+
+@login_required
+@require_GET
+def users(request):
+    if not can_view_users(request):
+        messages.error(request, "Du bist nicht berechtigt die Benutzer anzuzeigen.")
+        return redirect_next_or(request, "abi")
+
+    users = [(user, user.profile.external_mail) for user in User.objects.all()]
+
+    return render(request, "users.html", {"users": users})
+
+
+@login_required
+@require_GET
+def user_details(request, user_id):
+    pass
 
 
 @login_required

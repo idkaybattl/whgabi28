@@ -75,6 +75,7 @@ class Abikasse(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     has_had_tour = models.BooleanField(default=False)  # pyright: ignore[reportArgumentType]
+    external_mail = models.EmailField(blank=True, null=True)
 
     def total_earnings(self):
         return self.user.participating_projects.aggregate(Sum("earnings")).get(  # pyright: ignore[reportAttributeAccessIssue]

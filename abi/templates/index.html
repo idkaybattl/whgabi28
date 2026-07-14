@@ -57,6 +57,13 @@
             <p>Alle Aktionen einsehen</p>
         </a>
         {% endif %}
+
+        {% if can_view_users %}
+        <a class="card" href="{% url 'users' %}">
+            <h2>Benutzer</h2>
+            <p>Konten aller Schüler einsehen</p>
+        </a>
+        {% endif %}
     </section>
 </main>
 {% endblock %}

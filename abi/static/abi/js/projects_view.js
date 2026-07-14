@@ -20,10 +20,10 @@ function filterProjects(widget) {
       option.querySelector("#ending-datetime").innerHTML,
       option.querySelector("#description").innerHTML,
     ])
-    : allUserOptions.sort(
+    : allProjects.sort(
       (a, b) =>
-        a.querySelector("#project-title").value.localeCompare(
-          b.querySelector("#project-title").value, "de"
+        a.querySelector("#project-title").innerHTML.localeCompare(
+          b.querySelector("#project-title").innerHTML, "de"
         )
     );
 
