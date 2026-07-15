@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{% static 'abi/base.css' %}" />
     <link rel="stylesheet" href="{% static 'abi/colors.css' %}" />
     <link rel="stylesheet" href="{% static 'abi/participants_widget.css' %}" />
+    <link rel="stylesheet" href="{% static 'abi/projects.css' %}" />
     {% block head %} {% endblock %}
 
     <!-- Schrift -->
@@ -40,6 +41,8 @@
             <div class="profile-menu__content">
                 <a href="/projects/" class="profile-menu__link">Meine Aktionen</a>
                 <a href="/calendar/" class="profile-menu__link">Kalender</a>
+                <a data-popup-open="popup-big"
+                    data-popup-url="{% url 'user-details' request.user.id %}" class="profile-menu__link">Profil</a>
                 {% if user.is_staff %}
                 <a href="/admin/" class="profile-menu__link">Admin Panel</a>
                 {% endif %}
