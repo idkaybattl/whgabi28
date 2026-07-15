@@ -18,7 +18,6 @@ function filterProjects(widget) {
     ? searchItems(term, allUsers, (option) => [
       option.querySelector("#name").innerHTML,
       option.querySelector("#mail").innerHTML,
-      option.querySelector("#external-mail").innerHTML,
     ])
     : allUsers.sort(
       (a, b) =>

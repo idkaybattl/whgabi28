@@ -434,7 +434,7 @@ def users(request):
         messages.error(request, "Du bist nicht berechtigt die Benutzer anzuzeigen.")
         return redirect_next_or(request, "abi")
 
-    users = [(user, user.profile.external_mail) for user in User.objects.all()]
+    users = set(User.objects.all())
 
     return render(request, "users.html", {"users": users})
 
@@ -442,7 +442,25 @@ def users(request):
 @login_required
 @require_GET
 def user_details(request, user_id):
-    pass
+    if not can_view_users(request):
+        messages.error(request, "Du bist nicht berechtigt die Benutzer anzuzeigen.")
+        return redirect_next_or(request, "abi")
+
+    user = User.objects.get(pk=user_id)
+    total_hours = user.profile.total_hours()
+    total_earnings = user.profile.total_earnings()
+    project_participations = set(user.project_participations.all())
+
+    return render(
+        request,
+        "components/_user_details.html",
+        {
+            "user": user,
+            "total_hours": total_hours,
+            "total_earnings": total_earnings,
+            "project_participations": project_participations,
+        },
+    )
 
 
 @login_required

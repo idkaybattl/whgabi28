@@ -76,11 +76,11 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     has_had_tour = models.BooleanField(default=False)  # pyright: ignore[reportArgumentType]
     external_mail = models.EmailField(blank=True, null=True)
+    birthday = models.DateField(blank=True, null=True)
 
     def total_earnings(self):
-        return self.user.participating_projects.aggregate(Sum("earnings")).get(  # pyright: ignore[reportAttributeAccessIssue]
-            "earnings__sum", 0
-        )
+        result = self.user.participating_projects.aggregate(total=Sum("earnings"))  # pyright: ignore[reportAttributeAccessIssue]
+        return result["total"] or 0
 
     def total_hours(self):
         result = self.user.project_participations.aggregate(  # pyright: ignore[reportAttributeAccessIssue]
