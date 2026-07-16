@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Benutzer{% endblock %}
+
+
+{% block main %}
+<main class="user-page">
+    <section class="top-bar">
+        <h1>Benutzer</h1>
+    </section>
+
+    <section>
+        <input type="search" id="user_search" class="user__search" data-user-search placeholder="Nutzer suchen ..."
+            autocomplete="off" />
+    </section>
+
+    <section class="events-grid">
+        {% for user in users %}
+        {% include "components/_user_card.html" %}
+        {% empty %}
+        <article class="empty-users">
+            <h2>Keine Nutzer erstellt</h2>
+        </article>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'dashboard/js/users.js' %}"></script>
+{% endblock %}
