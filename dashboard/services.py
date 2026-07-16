@@ -20,7 +20,7 @@ def update_participants(event, selected_users):
 
 def save_event(form, user):
     if form.instance.pk:
-        old = set(form.cleaned_data["participants"])
+        old = set(form.instance.participants.all())
     else:
         old = set()
 
