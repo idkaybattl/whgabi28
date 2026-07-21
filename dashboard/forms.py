@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from .models import Event
+from .models import Event, UserProfile
 
 User = get_user_model()
 
@@ -184,3 +184,17 @@ class SetEarningsReceivedForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ["earnings_received"]
+
+
+class UserProfileForm(forms.ModelForm):
+    birthday = forms.DateField(
+        label="Geburtsdatum",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    external_mail = forms.EmailField(label="Externe E‑Mail", required=False)
+    has_had_tour = forms.BooleanField(label="Tour gehabt", required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ["has_had_tour", "external_mail", "birthday"]

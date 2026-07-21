@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Abi 28 - Abikasse{% endblock %}
+{% block title %}WHG Abi 2028{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'dashboard/index.css' %}" />
 {% endblock %}
 
-{%block main %}
+{% block main %}
 <main>
     <!-- Counter -->
     <section class="counter">
@@ -64,6 +64,11 @@
             <p>Konten aller Schüler einsehen</p>
         </a>
         {% endif %}
+
+        <a class="card" href="https://arnegeigerssteakhouse.m-fe.de">
+            <h2>Arne Geiger's Steakhous</h2>
+            <p>Nur für exquisite Geschmäcker</p>
+        </a>
     </section>
 </main>
 {% endblock %}

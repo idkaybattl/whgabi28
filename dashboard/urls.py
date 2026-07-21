@@ -7,6 +7,7 @@ urlpatterns = [
     path("login/", auth_views.LoginView.as_view(), name="login"),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("", views.main_page, name="main-page"),
+    path("introduction/", views.introduction, name="introduction"),
     # notifications
     path("notifications/", views.notifications, name="notifications"),
     path(
@@ -48,6 +49,7 @@ urlpatterns = [
     # users
     path("users/", views.users, name="users"),
     path("users/<int:user_id>/", views.user_details, name="user-details"),
+    path("users/<int:user_id>/edit/", views.edit_user, name="user-edit"),
     # polls
     path("polls/", views.polls, name="polls"),
 ]

@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET, require_POST
 
-from .forms import EventForm, SetEarningsForm, SetEarningsReceivedForm
+from .forms import EventForm, SetEarningsForm, SetEarningsReceivedForm, UserProfileForm
 from .models import Abikasse, Event, EventParticipation
 from .notifications import Notification
 from .services import save_event
@@ -29,7 +29,12 @@ def can_view_all_events(request):
 
 
 def can_view_users(request):
-    return request.user.is_staff
+    # currently everybody can view all users
+    return True
+
+
+def can_edit_user(request, user_id):
+    return request.user.is_staff or request.user.id == user_id
 
 
 def get_safe_next_url(request):
@@ -120,6 +125,22 @@ def main_page(request):
             "can_view_all_events": can_view_all_events(request),
             "can_view_users": can_view_users(request),
             "ranking": ranking,
+        },
+    )
+
+
+@login_required
+@require_GET
+def introduction(request):
+    # provide the profile form so the introduction can include the edit partial as step 2
+    form = UserProfileForm(instance=request.user.profile)
+    return render(
+        request,
+        "introduction.html",
+        {
+            "form": form,
+            "user": request.user,
+            "next_url": get_safe_next_url(request),
         },
     )
 
@@ -442,12 +463,13 @@ def users(request):
 def user_details(request, user_id):
     if not can_view_users(request):
         messages.error(request, "Du bist nicht berechtigt die Benutzer anzuzeigen.")
-        return redirect_next_or(request, "main-page")
+        return redirect_next_or(request, "users")
 
-    user = User.objects.get(pk=user_id)
+    user = get_object_or_404(User, pk=user_id)
     total_hours = user.profile.total_hours()
     total_earnings = user.profile.total_earnings()
     event_participations = set(user.event_participations.all())
+    can_edit = can_edit_user(request, user_id)
 
     return render(
         request,
@@ -457,8 +479,46 @@ def user_details(request, user_id):
             "total_hours": total_hours,
             "total_earnings": total_earnings,
             "event_participations": event_participations,
+            "can_edit": can_edit,
+            "next_url": get_safe_next_url(request),
         },
     )
+
+
+@login_required
+def edit_user(request, user_id):
+    if not can_edit_user(request, user_id):
+        messages.error(
+            request, "Du bist nicht berechtigt dieses Nutzerprofil zu bearbeiten"
+        )
+        return redirect_next_or(request, "users")
+
+    user = get_object_or_404(User, pk=user_id)
+
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, instance=user.profile)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profil erfolgreich aktualisiert.")
+            return redirect_next_or(request, "users")
+        else:
+            messages.error(request, "Form ist invalide.")
+            # render the partial with errors (status 400)
+            return render(
+                request,
+                "components/_user_edit.html",
+                {"form": form, "user": user, "next_url": get_safe_next_url(request)},
+                status=400,
+            )
+
+    else:
+        form = UserProfileForm(instance=user.profile)
+        return render(
+            request,
+            "components/_user_edit.html",
+            {"form": form, "user": user, "next_url": get_safe_next_url(request)},
+        )
 
 
 @login_required

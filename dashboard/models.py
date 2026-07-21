@@ -79,6 +79,9 @@ class UserProfile(models.Model):
     birthday = models.DateField(blank=True, null=True)
 
     def total_earnings(self):
+        # TODO: currently total bullshit, need to accumulate individual earnings per event:
+        # individual earnings being computed like:
+        # fraction of total hours the individual worked on event times event earnings
         result = self.user.participating_events.aggregate(total=Sum("earnings"))  # pyright: ignore[reportAttributeAccessIssue]
         return result["total"] or 0
 

@@ -3,6 +3,12 @@
         <header>
             <h2 id="user-name-{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</h2>
             <div class="details-header-action">
+                {% if can_edit %}
+                <button type="button" class="btn btn-primary" data-popup-open="popup-big"
+                    data-popup-url="{% url 'user-edit' user.id %}?next={{ next_url|urlencode }}">
+                    Bearbeiten
+                </button>
+                {% endif %}
             </div>
         </header>
 

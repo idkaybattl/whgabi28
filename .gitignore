@@ -144,3 +144,7 @@ compose.yml
 docker-compose.yaml
 docker-compose.yml
 docker-compose.override.yml
+
+# node modules
+node_modules/
+npm-debug.log*
