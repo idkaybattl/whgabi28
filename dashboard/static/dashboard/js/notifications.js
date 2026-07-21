@@ -1,72 +1,70 @@
-const csrfToken = getCookie('csrftoken');
+// Keep this file safe and passive when htmx is present; htmx handles notifications via markup.
+(function () {
+  const safeGetCookie = (name) => {
+    try {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    } catch (_) { }
+    return null;
+  };
+  const csrfToken = safeGetCookie('csrftoken');
 
-function updateNotificationIcon(icon, notificationCount) {
+  function updateNotificationIcon(icon, notificationCount) {
+    // no-op placeholder; implement icon badge update if you add an icon element
+  }
 
-}
+  // Legacy fetch-based flow (used only if htmx is not loaded)
+  function updateNotifications(widget) {
+    if (!widget) return;
+    const url = widget.getAttribute("data-url");
+    fetch(url)
+      .then(response => response.text())
+      .catch(error => console.error('Error fetching notifications:', error))
+      .then(notifications => {
+        if (!notifications) return;
+        widget.querySelector(".notifications-list").innerHTML = notifications;
 
-function updateNotifications(widget) {
-  // Logic to fetch and update notification data
-  const url = widget.getAttribute("data-url");
-  fetch(url)
-    .then(response => response.text()) // Assuming the response is HTML
-    .catch(error => console.error('Error fetching notifications:', error))
-    .then(notifications => {
-      widget.querySelector(".notifications-list").innerHTML = notifications;
-      widget.querySelectorAll('#mark-as-read').forEach(button => {
-        button.addEventListener('click', markAsRead);
+        // parse html to get notificationCount
+        const countEl = widget.querySelector("#notification-count");
+        const notificationCount = countEl ? countEl.innerHTML : 0;
+
+        const icon = widget.closest("notification-icon");
+        updateNotificationIcon(icon, notificationCount);
       });
+  }
 
-      // parse html to get notificationCount
-      const notificationCount = widget.querySelector("#notification-count").innerHTML;
-
-      const icon = widget.closest("notification-icon");
-      updateNotificationIcon(icon, notificationCount);
-    });
-}
-
-function markAllRead(event) {
-  const url = event.target.getAttribute("data-url");
-  fetch(url, {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken
-    },
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        updateNotifications(document.getElementById("notifications"));
-      }
+  function markAllRead(event) {
+    const url = event.target.getAttribute("data-url");
+    fetch(url, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken || ''
+      },
     })
-    .catch(error => {
-      console.error('Error marking all notifications as read:', error);
-    });
-}
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.success) {
+          updateNotifications(document.getElementById("notifications"));
+        }
+      })
+      .catch(error => {
+        console.error('Error marking all notifications as read:', error);
+      });
+  }
 
-function markAsRead(event) {
-  const url = event.target.getAttribute("data-url");
-  fetch(url, {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken
-    },
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        updateNotifications(document.getElementById("notifications"));
-      }
-    })
-    .catch(error => {
-      console.error('Error marking notification as read:', error);
-    });
-}
-
-// Attach event listeners
-document.addEventListener('DOMContentLoaded', function () {
-  updateNotifications(document.getElementById("notifications"));
-  document.getElementById("mark-all-as-read").addEventListener('click', markAllRead);
-
-});
+  // When htmx is present, do not attach legacy behavior to avoid duplicate requests
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.htmx) {
+      return; // htmx-driven via attributes in base.html and notifications.html
+    }
+    const notificationsRoot = document.getElementById("notifications");
+    if (!notificationsRoot) return;
+    updateNotifications(notificationsRoot);
+    const markAll = document.getElementById("mark-all-as-read");
+    if (markAll) {
+      markAll.addEventListener('click', markAllRead);
+    }
+  });
+})();

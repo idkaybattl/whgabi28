@@ -4,6 +4,9 @@
     data-popup-url="{% url 'event-details' notification.target.pk %}" {% else %} href="{{ notification.get_url }}"
     {% endif %}>
     <p>{{ notification }}</p>
-    <button id="mark-as-read" data-url="{% url 'mark-notification-as-read' notification.id %}">Gelesen</button>
+    <button type="button" class="mark-as-read" hx-post="{% url 'mark-notification-as-read' notification.id %}"
+        hx-swap="none" hx-on::after-request="htmx.trigger('#notifications','refresh')">
+        Gelesen
+    </button>
 </button>
 {% endfor %}

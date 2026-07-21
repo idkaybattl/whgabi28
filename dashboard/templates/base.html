@@ -1,9 +1,14 @@
 {% extends 'basesbase.html' %}
 {% block header %}
-<details id="notifications" class="notifications" data-url="{% url 'notifications' %}">
+<details id="notifications" class="notifications" data-url="{% url 'notifications' %}"
+    hx-get="{% url 'notifications' %}" hx-target="#notifications .notifications-list" hx-trigger="toggle, refresh"
+    hx-swap="innerHTML">
     <summary class="notifications-title">Benachrichtigungen</summary>
     <div class="notifications__content">
-        <button id="mark-all-as-read" data-url="{% url 'mark-all-notifications-as-read' %}">Alle gelesen
+        <button id="mark-all-as-read" data-url="{% url 'mark-all-notifications-as-read' %}"
+            hx-post="{% url 'mark-all-notifications-as-read' %}" hx-swap="none"
+            hx-on::after-request="htmx.trigger('#notifications','refresh')">
+            Alle gelesen
         </button>
         <div class="notifications-list">
         </div>
@@ -28,6 +33,8 @@
 {% else %}
 <a href="{% url 'login' %}" class="profile-btn">Login</a>
 {% endif %}
+
+
 {% endblock %}
 
 {% block content %}

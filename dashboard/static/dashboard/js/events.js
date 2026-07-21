@@ -94,6 +94,11 @@ function initEventFormValidation(form) {
       return;
     }
 
+    // If htmx will handle submission, don't do our own AJAX
+    if (form.hasAttribute("hx-post")) {
+      return;
+    }
+
     // Handle submit here (AJAX), with safe fallback
     event.preventDefault();
     try {
