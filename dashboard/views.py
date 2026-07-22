@@ -81,9 +81,25 @@ def get_event_creation_limit_error(user):
     return None
 
 
+def redirect_if_introduction_needed(request):
+    """
+    Helper used by views that should force the user through the introduction
+    before accessing the main site.
+    """
+    # The user is guaranteed to be authenticated (all callers are @login_required)
+    profile = request.user.profile
+    if not profile.has_had_introduction:
+        return redirect("introduction")  # name of the URL pattern
+    return None
+
+
 @login_required
 @require_GET
 def main_page(request):
+    intro_redirect = redirect_if_introduction_needed(request)
+    if intro_redirect:
+        return intro_redirect
+
     abikasse, _ = Abikasse.objects.get_or_create(
         pk=1,
         defaults={
@@ -130,10 +146,25 @@ def main_page(request):
 
 
 @login_required
-@require_GET
 def introduction(request):
-    # provide the profile form so the introduction can include the edit partial as step 2
-    form = UserProfileForm(instance=request.user.profile)
+    profile = request.user.profile
+
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            # Mark the introduction as completed
+            profile.has_had_introduction = True
+            profile.save(update_fields=["has_had_introduction"])
+
+            messages.success(request, "Dein Profil wurde gespeichert.")
+            # Respect a ?next= query‑parameter if present
+            return redirect_next_or(request, "main-page")
+        # If the form is invalid we fall through to the template rendering
+        # so the user can correct the errors.
+    else:
+        form = UserProfileForm(instance=profile)
+
     return render(
         request,
         "introduction.html",

@@ -14,11 +14,16 @@
 
         <section class="details-description" aria-label="Beschreibung">
             <h3>Beschreibung</h3>
-            <p>Geburtstag: {{ user.profile.birth_date | default:"Keine Angabe bisher" }}</p>
+            <p>Geburtstag: {{ user.profile.birthday | default:"Keine Angabe bisher" }}</p>
             <p>Nutzername: {{ user.username }}</p>
             <p>IServ Mail: {{ user.email }}</p>
             <p>Externe Mail: {{ user.profile.external_mail | default:"Keine Angabe bisher" }}</p>
-            <p>Telefonnummer: {{ user.profile.phone_numer | default:"Keine Angabe bisher" }}</p>
+            <p>Telefonnummer: {{ user.profile.phone_number | default:"Keine Angabe bisher" }}</p>
+        </section>
+
+        <section aria-label="Bio">
+            <h3>Bio</h3>
+            <p>{{ user.profile.bio | default:"Keine Bio vorhanden" }}</p>
         </section>
 
         <section class="details-schedule" aria-label="Projektteilnahmen">

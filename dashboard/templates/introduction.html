@@ -1,8 +1,9 @@
 {% extends 'basesbase.html' %}
 
+{% load static %}
+
 {% block head %}
 <link rel="stylesheet" href="{% static 'dashboard/introduction.css' %}" />
-
 {% endblock %}
 
 {% block content %}
@@ -52,7 +53,7 @@
             <button id="to-step-2">Weiter</button>
         </section>
         <section id="step-2" class="step hidden">
-            {% include "components/_user_edit.html" with user=user form=form next_url=next_url %}
+            {% include "components/_intro_user_edit.html" with form=form %}
         </section>
     </div>
 </main>
