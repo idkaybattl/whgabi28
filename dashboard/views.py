@@ -523,5 +523,11 @@ def edit_user(request, user_id):
 
 @login_required
 @require_GET
+def contact(request):
+    return render(request, "contact.html")
+
+
+@login_required
+@require_GET
 def polls(request):
     return render(request, "polls.html")

@@ -80,6 +80,8 @@ class UserProfile(models.Model):
     phone_number = PhoneNumberField(blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
 
+    bio = models.TextField(blank=True, null=True)
+
     def total_earnings(self):
         # TODO: currently total bullshit, need to accumulate individual earnings per event:
         # individual earnings being computed like:

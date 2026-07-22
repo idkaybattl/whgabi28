@@ -195,7 +195,8 @@ class UserProfileForm(forms.ModelForm):
     )
     external_mail = forms.EmailField(label="Externe E‑Mail", required=False)
     phone_number = PhoneNumberField(region="DE")
+    bio = forms.Textarea()
 
     class Meta:
         model = UserProfile
-        fields = ["external_mail", "phone_number", "birthday"]
+        fields = ["external_mail", "phone_number", "birthday", "bio"]

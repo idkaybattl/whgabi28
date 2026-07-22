@@ -50,6 +50,8 @@ urlpatterns = [
     path("users/", views.users, name="users"),
     path("users/<int:user_id>/", views.user_details, name="user-details"),
     path("users/<int:user_id>/edit/", views.edit_user, name="user-edit"),
+    # contact
+    path("contact/", views.contact, name="contact"),
     # polls
     path("polls/", views.polls, name="polls"),
 ]
