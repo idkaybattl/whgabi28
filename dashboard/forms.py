@@ -193,8 +193,7 @@ class UserProfileForm(forms.ModelForm):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     external_mail = forms.EmailField(label="Externe E‑Mail", required=False)
-    has_had_tour = forms.BooleanField(label="Tour gehabt", required=False)
 
     class Meta:
         model = UserProfile
-        fields = ["has_had_tour", "external_mail", "birthday"]
+        fields = ["external_mail", "birthday"]

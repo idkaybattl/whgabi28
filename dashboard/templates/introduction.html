@@ -1,5 +1,10 @@
 {% extends 'basesbase.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="{% static 'dashboard/introduction.css' %}" />
+
+{% endblock %}
+
 {% block content %}
 <main>
     <h1>Home Page</h1>
@@ -54,22 +59,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.getElementById('to-step-2')?.addEventListener('click', function () {
-        document.getElementById('step-1').classList.add('hidden');
-        document.getElementById('step-2').classList.remove('hidden');
-
-        // If you want to focus the first input in the form:
-        const firstInput = document.querySelector('#step-2 form input, #step-2 form textarea, #step-2 form select');
-        if (firstInput) firstInput.focus();
-    });
-</script>
-{% endblock %}
-
-{% block head %}
-<style>
-    .step.hidden {
-        display: none;
-    }
-</style>
+<script src="{% static 'dashboard/js/introduction.js'  %}"></script>
 {% endblock %}
